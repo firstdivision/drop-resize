@@ -1,0 +1,274 @@
+.app-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2.2rem 1.2rem 2.8rem;
+  display: grid;
+  gap: 1rem;
+  position: relative;
+}
+
+.gear-button {
+  position: fixed;
+  top: 1.1rem;
+  right: 1.1rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  z-index: 40;
+}
+
+.gear-button svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.drop-zone {
+  border: 2px dashed var(--edge-strong);
+  border-radius: 18px;
+  padding: 1.4rem;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.8), rgba(255, 245, 234, 0.9));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.drop-zone.dragging {
+  transform: translateY(-2px);
+  border-color: var(--accent);
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.controls-grid label {
+  display: grid;
+  gap: 0.38rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.template-field {
+  grid-column: 1 / -1;
+}
+
+.template-help {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  background: #fffefc;
+}
+
+.output-row,
+.files-panel,
+.results-panel {
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  padding: 0.9rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.output-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.output-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.config-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(21, 14, 8, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 30;
+  padding: 1rem;
+}
+
+.config-panel {
+  width: min(700px, 100%);
+  max-height: 100%;
+  overflow: auto;
+  border: 1px solid var(--edge-strong);
+  border-radius: 18px;
+  background: #fff8f1;
+  padding: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.config-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.config-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.output-row .label {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+}
+
+.output-row .path {
+  margin: 0.2rem 0 0;
+  font-size: 0.94rem;
+  overflow-wrap: anywhere;
+}
+
+.files-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.files-header p,
+.results-panel p {
+  margin: 0;
+  font-weight: 700;
+}
+
+.files-panel ul,
+.results-panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+  max-height: 240px;
+  overflow: auto;
+}
+
+.files-panel li,
+.results-panel li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid var(--edge-soft);
+  background: #fffdfa;
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+}
+
+.files-panel li span,
+.results-panel li span {
+  overflow-wrap: anywhere;
+}
+
+.results-panel li {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.results-panel .ok {
+  border-color: #7fca97;
+}
+
+.results-panel .fail {
+  border-color: #d68484;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+button {
+  border: 1px solid var(--edge-strong);
+  border-radius: 10px;
+  background: #fffefb;
+  color: var(--ink);
+  padding: 0.55rem 0.8rem;
+  cursor: pointer;
+}
+
+button.primary {
+  border-color: transparent;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.status {
+  margin: 0;
+  font-weight: 700;
+}
+
+.status.success {
+  color: #0f7f35;
+}
+
+.status.error {
+  color: #a42828;
+}
+
+@media (max-width: 760px) {
+  .gear-button {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .drop-zone,
+  .output-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .output-actions {
+    justify-content: stretch;
+  }
+
+  .output-actions button {
+    width: 100%;
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}

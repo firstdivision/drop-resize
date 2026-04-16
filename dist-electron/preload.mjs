@@ -1,0 +1,1 @@
+"use strict";const e=require("electron");e.contextBridge.exposeInMainWorld("dropResize",{pickImages(){return e.ipcRenderer.invoke("files:pick-images")},pickOutputDir(){return e.ipcRenderer.invoke("files:pick-output-dir")},resizeImages(i){return e.ipcRenderer.invoke("images:resize",i)}});
