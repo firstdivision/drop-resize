@@ -57,3 +57,26 @@ npm run build
 ```
 
 Build outputs are created in the release folder.
+
+## GitHub Releases (Linux + Windows)
+
+This repo includes a GitHub Actions workflow at `.github/workflows/release.yml` that:
+
+- builds Linux and Windows packages in CI
+- creates/updates a GitHub Release
+- uploads built installers to the Release assets for public download
+
+### Trigger options
+
+- Push a tag (recommended for fixed versions):
+
+```bash
+git tag v1.2.3
+git push origin v1.2.3
+```
+
+- Run manually from **Actions -> Build and Publish Release -> Run workflow**:
+  - leave `version` empty to auto-generate a date-based version like `2026.4.17-build.142`
+  - or set `version` explicitly (for example `1.2.3`)
+
+Version values are validated as SemVer because Electron Builder uses the app version for artifact naming and output folders.

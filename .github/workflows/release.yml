@@ -1,0 +1,147 @@
+name: Build and Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Optional version (SemVer, no leading v). Example: 2026.4.17"
+        required: false
+        type: string
+      publish_latest:
+        description: "Mark this as the latest release"
+        required: false
+        default: true
+        type: boolean
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  prepare:
+    name: Resolve Release Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      tag: ${{ steps.resolve.outputs.tag }}
+      publish_latest: ${{ steps.resolve.outputs.publish_latest }}
+    steps:
+      - name: Resolve version/tag values
+        id: resolve
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            tag="${GITHUB_REF_NAME}"
+            version="${tag#v}"
+            publish_latest="true"
+          else
+            input_version="${{ github.event.inputs.version }}"
+            input_latest="${{ github.event.inputs.publish_latest }}"
+
+            if [[ -n "${input_version}" ]]; then
+              version="${input_version#v}"
+            else
+              y="$(date -u +%Y)"
+              m="$(date -u +%-m)"
+              d="$(date -u +%-d)"
+              version="${y}.${m}.${d}-build.${GITHUB_RUN_NUMBER}"
+            fi
+
+            tag="v${version}"
+            if [[ -n "${input_latest}" ]]; then
+              publish_latest="${input_latest}"
+            else
+              publish_latest="true"
+            fi
+          fi
+
+          if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Version '${version}' is not valid SemVer (example: 1.2.3 or 2026.4.17-build.42)."
+            exit 1
+          fi
+
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+          echo "tag=${tag}" >> "${GITHUB_OUTPUT}"
+          echo "publish_latest=${publish_latest}" >> "${GITHUB_OUTPUT}"
+
+  build:
+    name: Build (${{ matrix.platform }})
+    needs: prepare
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: windows
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Set app version for this build
+        run: npm version "${{ needs.prepare.outputs.version }}" --no-git-tag-version --allow-same-version
+
+      - name: Build app
+        run: npm run build
+
+      - name: Collect release files
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="${{ needs.prepare.outputs.version }}"
+          mkdir -p upload
+          find "release/${version}" -maxdepth 1 -type f -print0 | xargs -0 -I{} cp "{}" upload/
+          ls -lah upload
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.platform }}
+          path: upload/*
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub Release
+    needs:
+      - prepare
+      - build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: release-*
+          merge-multiple: true
+          path: artifacts
+
+      - name: Show artifact list
+        run: ls -lah artifacts
+
+      - name: Create/Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          name: Drop Resize ${{ needs.prepare.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          make_latest: ${{ needs.prepare.outputs.publish_latest }}
+          files: artifacts/*
