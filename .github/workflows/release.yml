@@ -98,7 +98,7 @@ jobs:
         run: npm version "${{ needs.prepare.outputs.version }}" --no-git-tag-version --allow-same-version
 
       - name: Build app
-        run: npm run build
+        run: npm run build -- --publish never
 
       - name: Collect release files
         shell: bash
