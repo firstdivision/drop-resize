@@ -1,5 +1,7 @@
 # Drop Resize
 
+![Drop Resize Screenshot](img/Screenshot.png)
+
 Drop Resize is an Electron desktop app for batch image resizing.
 
 ## Current Features
