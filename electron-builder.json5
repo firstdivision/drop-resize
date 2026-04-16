@@ -36,11 +36,15 @@
       }
     ]
   },
+  "portable": {
+    "artifactName": "${productName}-Windows-${version}-Portable.${ext}"
+  },
   "nsis": {
     "oneClick": false,
     "perMachine": false,
     "allowToChangeInstallationDirectory": true,
-    "deleteAppDataOnUninstall": false
+    "deleteAppDataOnUninstall": false,
+    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
   },
   "linux": {
     "icon": "assets/icons/drop-resize.png",
